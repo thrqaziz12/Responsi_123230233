@@ -1,36 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'controller/auth_controller.dart';
+import 'controller/meal_controller.dart';
+import 'controller/favorite_controller.dart';
+import 'model/meal_model.dart';
 import 'routes/app_routes.dart';
-import 'routes/app_pages.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Hive.initFlutter();
+  Hive.registerAdapter(MealAdapter());
+  await Hive.openBox<Meal>('favorites');
+
+  Get.put(AuthController());
+  Get.put(MealController());
+  Get.put(FavoriteController());
+
+  final prefs = await SharedPreferences.getInstance();
+  final isLoggedIn = prefs.getBool('is_logged_in') ?? false;
+
+  runApp(MyApp(initialRoute: isLoggedIn ? '/home' : '/login'));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String initialRoute;
+
+  const MyApp({super.key, required this.initialRoute});
 
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'Resep Masakan App',
+      title: 'MealExplorer',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        scaffoldBackgroundColor: const Color(0xFF0A0E1A),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color.fromARGB(255, 255, 236, 231),
-          foregroundColor: Colors.white,
-          elevation: 0,
-          titleTextStyle: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-          iconTheme: IconThemeData(color: Colors.white),
-        ),
+        useMaterial3: true,
+        colorSchemeSeed: const Color(0xFFFF6B35),
+        fontFamily: 'Roboto',
       ),
-      initialRoute: AppRoutes.login,
-      getPages: AppPages.pages,
+      initialRoute: initialRoute,
+      getPages: AppRoutes.pages,
     );
   }
 }
