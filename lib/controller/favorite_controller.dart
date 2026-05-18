@@ -18,8 +18,9 @@ class FavoriteController extends GetxController {
     favorites.value = _favoriteBox.values.toList();
   }
 
+  // Membaca dari favorites.obs agar Obx bisa mendeteksi perubahan
   bool isFavorite(String idMeal) {
-    return _favoriteBox.values.any((m) => m.idMeal == idMeal);
+    return favorites.any((m) => m.idMeal == idMeal);
   }
 
   Future<void> toggleFavorite(Meal meal) async {
