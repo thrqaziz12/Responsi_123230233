@@ -82,7 +82,6 @@ class DetailPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Hero image
               item.strMealThumb.isNotEmpty
                   ? Image.network(
                       item.strMealThumb,
@@ -113,7 +112,6 @@ class DetailPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Title
                     Text(
                       item.strMeal,
                       style: const TextStyle(
@@ -124,7 +122,6 @@ class DetailPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    // Author
                     Row(
                       children: [
                         const Icon(
@@ -136,7 +133,6 @@ class DetailPage extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    // Date
                     Row(
                       children: [
                         const Icon(
@@ -150,7 +146,6 @@ class DetailPage extends StatelessWidget {
                     const SizedBox(height: 20),
                     const Divider(color: Colors.white12),
                     const SizedBox(height: 16),
-                    // Summary
                     const Text(
                       'Ringkasan',
                       style: TextStyle(
