@@ -1,79 +1,47 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../routes/app_routes.dart';
 
 class AuthController extends GetxController {
-  final isLoading = false.obs;
+  var isLoggedIn = false.obs;
+  var loggedInUsername = ''.obs;
 
-  Future<void> register(String username, String email, String password) async {
-    isLoading.value = true;
-    final prefs = await SharedPreferences.getInstance();
-    if (prefs.containsKey('user_$username')) {
-      isLoading.value = false;
-      Get.snackbar(
-        'Gagal',
-        'Username sudah digunakan',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: const Color(0xFFE53935),
-        colorText: const Color(0xFFFFFFFF),
-      );
-      return;
-    }
-    await prefs.setString('user_$username', password);
-    await prefs.setString('email_$username', email);
-    isLoading.value = false;
-    Get.snackbar(
-      'Berhasil',
-      'Akun dibuat, silakan login',
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: const Color(0xFF43A047),
-      colorText: const Color(0xFFFFFFFF),
-    );
-    await Future.delayed(const Duration(milliseconds: 800));
-    Get.offAllNamed(AppRoutes.login);
+  static const String _keyUsername = 'username';
+  static const String _keyLoggedIn = 'is_logged_in';
+
+  final Map<String, String> _validUsers = {
+    'thoriq': '233',
+  };
+
+  @override
+  void onInit() {
+    super.onInit();
+    _loadSession();
   }
 
-  Future<void> login(String username, String password) async {
-    isLoading.value = true;
+  Future<void> _loadSession() async {
     final prefs = await SharedPreferences.getInstance();
-    final stored = prefs.getString('user_$username');
-    if (stored == null) {
-      isLoading.value = false;
-      Get.snackbar(
-        'Gagal',
-        'Username tidak ditemukan',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: const Color(0xFFE53935),
-        colorText: const Color(0xFFFFFFFF),
-      );
-      return;
+    isLoggedIn.value = prefs.getBool(_keyLoggedIn) ?? false;
+    loggedInUsername.value = prefs.getString(_keyUsername) ?? '';
+  }
+
+  Future<bool> login(String username, String password) async {
+    final expectedPassword = _validUsers[username.toLowerCase()];
+    if (expectedPassword != null && password == expectedPassword) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_keyLoggedIn, true);
+      await prefs.setString(_keyUsername, username);
+      isLoggedIn.value = true;
+      loggedInUsername.value = username;
+      return true;
     }
-    if (stored != password) {
-      isLoading.value = false;
-      Get.snackbar(
-        'Gagal',
-        'Password salah',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: const Color(0xFFE53935),
-        colorText: const Color(0xFFFFFFFF),
-      );
-      return;
-    }
-    await prefs.setBool('is_logged_in', true);
-    await prefs.setString('username', username);
-    isLoading.value = false;
-    Get.offAllNamed(AppRoutes.home);
+    return false;
   }
 
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('is_logged_in', false);
-    Get.offAllNamed(AppRoutes.login);
-  }
-
-  static Future<String> getSavedUsername() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('username') ?? '';
+    await prefs.remove(_keyLoggedIn);
+    await prefs.remove(_keyUsername);
+    isLoggedIn.value = false;
+    loggedInUsername.value = '';
   }
 }
