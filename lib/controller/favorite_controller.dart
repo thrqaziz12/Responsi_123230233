@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../model/meal_model.dart';
