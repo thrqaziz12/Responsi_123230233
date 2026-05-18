@@ -88,7 +88,6 @@ class HomePage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Gambar
                       ClipRRect(
                         borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(14),
